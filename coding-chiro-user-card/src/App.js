@@ -1,26 +1,70 @@
 import React from 'react';
-import logo from './logo.svg';
+import axios from 'axios';
 import './App.css';
+import UserCard from "./Components/Usercard"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>
-          This is the start of my homework!!! WOO HOO!
-        </h1>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    console.log ("constructor running");
+    super();
+    this.state={
+      user= [],
+      followers= [],
+    };
+  }
+
+    componentDidMount(){
+      axios
+        .get(`https://api.github.com/users/drcrystalm`)
+        
+        .then((res)=> {
+          console.log(res)
+          this.setState({
+            name: res.data.name,
+            user: res.data.login,
+            bio: res.data.bio,
+            company: res.data.company,
+            location: res.data.location,
+            followers: res.data.followers,
+          })
+        })
+
+        .catch(res)((err)=> console.log(err, "No bueno!"))      
+   
+
+      axios
+        .get(`https://api.github.com/users/drcrystalm/followers`)
+
+        .then((res)=> {
+          console.log(res.data, "From second axios call")
+          this.setState({
+            followers: res.data,
+          })
+        })
+
+        .catch((err)=> console.log(err, "Error from componentDidUpdate"))
+    }
+
+    render(){
+      console.log(this.state)
+      return(
+        <div>
+          <UserCard
+            name={this.state.name}
+            bio={this.state.bio}
+            location={this.state.location}
+            company={this.state.company}
+            user={this.state.user}
+            followers={this.state.followers}
+          />
+
+          {this.state.followers.map(followers =>(
+            <h1>Name: followers.name</h1>
+          ))}
+
+        </div>
+      )
+    }
 }
 
 export default App;
